@@ -5,43 +5,47 @@ using namespace std;
 class Solution {
 public:
     vector<int> maxSlidingWindow(vector<int>& nums, int k) {
-        vector<int> ans; 
-        int largest_in_wndow = 0;
-        int second_largest_in_window = 0;
-        int last = 0;
-        int second_last = 0;
-
-
-        for(int i = 0; i < nums.size(); i++){
-            if (i < k-1 ){
-                if (nums[i] > largest_in_wndow){
-                    largest_in_wndow = nums[i];
-                    last = i;
-                }
-                continue;
-            }
-            // check if largest is still in windows
-            if (last > 0){
-                if (nums[i] > largest_in_wndow){
-                    largest_in_wndow = nums[i];
-                    last = k;
-                }
-            }
-            else{
-                // find through the past k to find the max value
-                largest_in_wndow = nums[i];
-                for (int j = 0; j < k; j++){
-                    if (nums[i-j] > largest_in_wndow){
-                        largest_in_wndow = nums[i-j];
-                        last = k-j;
-                    }
-                }
-            }
-            ans.push_back(largest_in_wndow);
-            last--;
+        vector<int> ans;  
+        int n = nums.size();
+    }
+    inline int parent(int i){
+        return (i-1)/2;
+    }
+    inline int left_child(int i){
+        return 2*i + 1;
+    }
+    inline int right_child(int i){
+        return 2*i + 2;
+    }
+    // heapify starts from the parent node 
+    void heapify(vector<int> nums, int i){
+        int size = nums.size();
+        int largest = nums[i];
+        // check if either child is larger than the parent
+        if (largest < nums[left_child(i)] && left_child(i) < size){
+            largest = nums[left_child(i)];
         }
-
-        return ans;
+        if (largest < nums[right_child(i)] && right_child(i) < size){
+            largest = nums[right_child(i)];
+        }
+        // if larger
+        if (largest != nums[i]){
+            swap(nums[i], nums[largest]);
+            heapify(nums, largest);
+        }
+    }
+    void insert(vector<int> nums, int i){
+        int size = nums.size();
+        if (size == 0){
+            nums.push_back(i);
+        }
+        else{
+            nums.push_back(i);
+            for (int j = parent(size); j >= 0; j--){
+                heapify(nums, j);
+                j = parent(j);
+            }
+        }
     }
 };
 
@@ -54,8 +58,6 @@ int main(){
     for(int i = 0; i < ans.size(); i++){
         cout << ans[i] << " ";
     }
-
-
     cout << endl;
 
     return 0;
